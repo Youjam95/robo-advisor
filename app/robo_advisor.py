@@ -15,8 +15,14 @@ def to_usd(my_price):
 
 
 api_key= os.environ.get("ALPHAVANTAGE_API_KEY")
-
+#validting imput
 symbol= input("Please input the desired stock symbol")
+if symbol.isdigit():
+     print("This is not a valid stock symbol, please run the app again and input a valid symbol")
+     exit
+    
+
+
 request_url = f"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={symbol}&interval=5min&apikey={api_key}"
 
 checkout_start_at = dt.datetime.now() 
@@ -70,6 +76,14 @@ with open(csv_file_path, "w") as csv_file: # "w" means "open the file for writin
          "close" :daily_prices["4. close"],
          "volume": daily_prices["5. volume"] })   
 
+
+#Algorithim for buying or not buying
+decision = " Don't Buy"
+reason = "The Stock's latest closing price is higher than 20% above its recent low."
+if float(latest_close)  < (1.2 * float(recent_low ) ): 
+    decision = "BUY" 
+    reason = "The Stock's latest closing price is less than 20% above its recent low."
+
 # info output
 
 print("-------------------------")
@@ -83,8 +97,8 @@ print(f"LATEST CLOSE: {to_usd(float(latest_close))}")
 print(f"RECENT HIGH: {to_usd(float(recent_high))} ")
 print(f"RECENT LOW: {to_usd(float(recent_low))} ")
 print("-------------------------")
-print("RECOMMENDATION: BUY!")
-print("RECOMMENDATION REASON: TODO")
+print(f"RECOMMENDATION: {decision}")
+print(f"RECOMMENDATION REASON: {reason}")
 print("-------------------------")
 print(f"Writing data to CSV : {csv_file_path}  ")
 print("-------------------------")
