@@ -3,17 +3,23 @@
 import requests
 import json
 import os
-
+from dotenv import load_dotenv
 import csv
+import datetime as dt
+
+load_dotenv() #> loads contents of the .env file into the script's environment
+
 def to_usd(my_price):
     return "${0:,.2f}".format(my_price)
 # info inputs 
 
 
+api_key= os.environ.get("ALPHAVANTAGE_API_KEY")
 
+symbol= input("Please input the desired stock symbol")
+request_url = f"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={symbol}&interval=5min&apikey={api_key}"
 
-request_url = "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=MSFT&interval=5min&apikey=demo"
-
+checkout_start_at = dt.datetime.now() 
 response = requests.get(request_url)
 #print(type(response))
 #print(response.status_code)
@@ -54,22 +60,23 @@ csv_headers= ["timestamp","open","high","low","close","volume"]
 with open(csv_file_path, "w") as csv_file: # "w" means "open the file for writing"
     writer = csv.DictWriter(csv_file, fieldnames=csv_headers )
     writer.writeheader() # uses fieldnames set above
-    writer.writerow({ 
-        "timestamp" :  "TODO" , 
-        "open" : "TODO" ,
-        "high" : "TODO",
-        "low"  : "TODO",
-        "close" :"TODO",
-        "volume": "TODO" })
-   
+    for date in dates:
+        daily_prices= tsd[date]
+        writer.writerow ({ 
+         "timestamp" :  date, 
+         "open" : daily_prices["1. open"] ,
+         "high" : daily_prices["2. high"],
+          "low"  : daily_prices["3. low"],
+         "close" :daily_prices["4. close"],
+         "volume": daily_prices["5. volume"] })   
 
 # info output
 
 print("-------------------------")
-print("SELECTED SYMBOL: XYZ")
+print(f"SELECTED SYMBOL: {symbol}")
 print("-------------------------")
 print("REQUESTING STOCK MARKET DATA...")
-print("REQUEST AT: 2018-02-20 02:00pm")
+print("Requested at: " + checkout_start_at.strftime("%Y-%m-%d %I:%M %p"))
 print("-------------------------")
 print(f"LATEST DAY: {last_refreshed}")
 print(f"LATEST CLOSE: {to_usd(float(latest_close))}")
