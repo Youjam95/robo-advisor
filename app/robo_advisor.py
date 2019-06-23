@@ -17,9 +17,12 @@ response = requests.get(request_url)
 #print(response.text)
 
 parsed_response = json.loads(response.text)
-
+tsd = parsed_response["Time Series (5min)"]
+dates = list(tsd.keys())
+latest_day = dates[0]
 last_refreshed = parsed_response["Meta Data"]["3. Last Refreshed"]
-latest_close = parsed_response["Time Series (5min)"]["2019-06-21 16:00:00"]["4. close"]
+tsd = parsed_response["Time Series (5min)"]
+latest_close = tsd[latest_day]["4. close"]
 
 #breakpoint()
 
